@@ -8,7 +8,7 @@ from diffusers.schedulers import LMSDiscreteScheduler
 
 from stable_diffusion_videos import StableDiffusionWalkPipeline
 
-MODEL_ID = "nitrosocke/mo-di-diffusion"
+MODEL_ID = "nitrosocke/Ghibli-Diffusion"
 MODEL_VAE = "stabilityai/sd-vae-ft-ema"
 MODEL_CACHE = "diffusers-cache"
 

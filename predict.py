@@ -24,7 +24,7 @@ class Predictor(BasePredictor):
             MODEL_ID,
             vae=vae,
             torch_dtype=torch.float16,
-            revision="0d91e905738bdf4b444cb413be359e193f857653",
+            revision="a20c448ad20e797115c379fa2418c5ad64a4cd5c",
             safety_checker=None,
             cache_dir=MODEL_CACHE,
             local_files_only=True,

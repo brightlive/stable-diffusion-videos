@@ -8,7 +8,7 @@ from diffusers.schedulers import LMSDiscreteScheduler
 
 from stable_diffusion_videos import StableDiffusionWalkPipeline
 
-MODEL_ID = "prompthero/openjourney"
+MODEL_ID = "prompthero/openjourney-v4"
 MODEL_VAE = "stabilityai/sd-vae-ft-ema"
 MODEL_CACHE = "diffusers-cache"
 
@@ -22,6 +22,7 @@ class Predictor(BasePredictor):
 
         self.pipeline = StableDiffusionWalkPipeline.from_pretrained(
             MODEL_ID,
+            revision="c9211c53404dd6f4cfac5f04f33535892260668e",
             vae=vae,
             torch_dtype=torch.float16,
             safety_checker=None,

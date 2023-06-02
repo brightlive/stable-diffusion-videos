@@ -23,6 +23,7 @@ vae = AutoencoderKL.from_pretrained(
 
 pipe = StableDiffusionPipeline.from_pretrained(
     MODEL_ID,
+    revision="c9211c53404dd6f4cfac5f04f33535892260668e",
     vae=vae,
     cache_dir=MODEL_CACHE,
 )

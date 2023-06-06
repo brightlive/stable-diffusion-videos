@@ -8,7 +8,7 @@ from diffusers.schedulers import LMSDiscreteScheduler
 
 from stable_diffusion_videos import StableDiffusionWalkPipeline
 
-MODEL_ID = "prompthero/openjourney-v4"
+MODELS = ["runwayml/stable-diffusion-v1-5", "prompthero/openjourney-v4", "hakurei/waifu-diffusion", "nitrosocke/mo-di-diffusion"]
 MODEL_VAE = "stabilityai/sd-vae-ft-ema"
 MODEL_CACHE = "diffusers-cache"
 
@@ -21,8 +21,8 @@ class Predictor(BasePredictor):
         vae = AutoencoderKL.from_pretrained(MODEL_VAE, cache_dir=MODEL_CACHE, local_files_only=True)
 
         self.pipeline = StableDiffusionWalkPipeline.from_pretrained(
-            MODEL_ID,
-            revision="c9211c53404dd6f4cfac5f04f33535892260668e",
+            model_name,
+            #revision="c9211c53404dd6f4cfac5f04f33535892260668e",
             vae=vae,
             torch_dtype=torch.float16,
             safety_checker=None,
@@ -54,6 +54,10 @@ class Predictor(BasePredictor):
     @torch.cuda.amp.autocast()
     def predict(
         self,
+        model_name: str = Input(
+            description="Model name on huggingface",
+            default="runwayml/stable-diffusion-v1-5"
+        ),
         prompts: str = Input(
             description="Input prompts, separate each prompt with '|'.",
             default="a cat | a dog | a horse",

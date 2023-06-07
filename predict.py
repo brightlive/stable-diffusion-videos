@@ -17,22 +17,7 @@ class Predictor(BasePredictor):
     def setup(self):
         """Load the model into memory to make running multiple predictions efficient"""
         print("Loading pipeline...")
-
-        vae = AutoencoderKL.from_pretrained(MODEL_VAE, cache_dir=MODEL_CACHE, local_files_only=True)
-
-        self.pipeline = StableDiffusionWalkPipeline.from_pretrained(
-            model_name,
-            #revision="c9211c53404dd6f4cfac5f04f33535892260668e",
-            vae=vae,
-            torch_dtype=torch.float16,
-            safety_checker=None,
-            cache_dir=MODEL_CACHE,
-            local_files_only=True,
-            scheduler=LMSDiscreteScheduler(
-                beta_start=0.00085, beta_end=0.012, beta_schedule="scaled_linear"
-            )
-        ).to("cuda")
-
+        
         default_scheduler = PNDMScheduler(
             beta_start=0.00085, beta_end=0.012, beta_schedule="scaled_linear"
         )
@@ -89,6 +74,21 @@ class Predictor(BasePredictor):
         ),
     ) -> Path:
         """Run a single prediction on the model"""
+
+        vae = AutoencoderKL.from_pretrained(MODEL_VAE, cache_dir=MODEL_CACHE, local_files_only=True)
+
+        self.pipeline = StableDiffusionWalkPipeline.from_pretrained(
+            model_name,
+            #revision="c9211c53404dd6f4cfac5f04f33535892260668e",
+            vae=vae,
+            torch_dtype=torch.float16,
+            safety_checker=None,
+            cache_dir=MODEL_CACHE,
+            local_files_only=True,
+            scheduler=LMSDiscreteScheduler(
+                beta_start=0.00085, beta_end=0.012, beta_schedule="scaled_linear"
+            )
+        ).to("cuda")
 
         prompts = [p.strip() for p in prompts.split("|")]
         if seeds is None:

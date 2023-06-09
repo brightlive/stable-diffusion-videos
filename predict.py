@@ -47,6 +47,10 @@ class Predictor(BasePredictor):
             description="Input prompts, separate each prompt with '|'.",
             default="a cat | a dog | a horse",
         ),
+        negative_prompt: str = Input(
+            description="Negative prompts, separated by spaces",
+            default="",
+        ),
         seeds: str = Input(
             description="Random seed, separated with '|' to use different seeds for each of the prompt provided above. Leave blank to randomize the seed.",
             default=None,
@@ -130,6 +134,7 @@ class Predictor(BasePredictor):
 
         self.pipeline.walk(
             prompts=prompts,
+            negative_prompt=negative_prompt,
             seeds=seeds,
             num_interpolation_steps=num_steps,
             output_dir="cog_out",

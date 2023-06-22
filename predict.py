@@ -8,7 +8,7 @@ from diffusers.schedulers import LMSDiscreteScheduler
 
 from stable_diffusion_videos import StableDiffusionWalkPipeline
 
-MODELS = ["runwayml/stable-diffusion-v1-5", "prompthero/openjourney-v4", "hakurei/waifu-diffusion", "nitrosocke/mo-di-diffusion"]
+MODELS = ["runwayml/stable-diffusion-v1-5", "prompthero/openjourney-v4", "admruul/anything-v3.0", "nitrosocke/mo-di-diffusion"]
 MODEL_VAE = "stabilityai/sd-vae-ft-ema"
 MODEL_CACHE = "diffusers-cache"
 
@@ -40,6 +40,7 @@ class Predictor(BasePredictor):
     def predict(
         self,
         model_name: str = Input(
+            choices=MODELS,
             description="Model name on huggingface",
             default="runwayml/stable-diffusion-v1-5"
         ),

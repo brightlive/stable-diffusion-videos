@@ -8,7 +8,7 @@ from diffusers.schedulers import LMSDiscreteScheduler
 
 from stable_diffusion_videos import StableDiffusionWalkPipeline
 
-MODEL_ID = "runwayml/stable-diffusion-v1-5"
+MODELS = ["runwayml/stable-diffusion-v1-5", "prompthero/openjourney-v4", "admruul/anything-v3.0", "nitrosocke/mo-di-diffusion"]
 MODEL_VAE = "stabilityai/sd-vae-ft-ema"
 MODEL_CACHE = "diffusers-cache"
 
@@ -17,22 +17,7 @@ class Predictor(BasePredictor):
     def setup(self):
         """Load the model into memory to make running multiple predictions efficient"""
         print("Loading pipeline...")
-
-        vae = AutoencoderKL.from_pretrained(MODEL_VAE, cache_dir=MODEL_CACHE, local_files_only=True)
-
-        self.pipeline = StableDiffusionWalkPipeline.from_pretrained(
-            MODEL_ID,
-            vae=vae,
-            torch_dtype=torch.float16,
-            revision="fp16",
-            safety_checker=None,
-            cache_dir=MODEL_CACHE,
-            local_files_only=True,
-            scheduler=LMSDiscreteScheduler(
-                beta_start=0.00085, beta_end=0.012, beta_schedule="scaled_linear"
-            )
-        ).to("cuda")
-
+        
         default_scheduler = PNDMScheduler(
             beta_start=0.00085, beta_end=0.012, beta_schedule="scaled_linear"
         )
@@ -54,9 +39,18 @@ class Predictor(BasePredictor):
     @torch.cuda.amp.autocast()
     def predict(
         self,
+        model_name: str = Input(
+            choices=MODELS,
+            description="Model name on huggingface",
+            default="runwayml/stable-diffusion-v1-5"
+        ),
         prompts: str = Input(
             description="Input prompts, separate each prompt with '|'.",
             default="a cat | a dog | a horse",
+        ),
+        negative_prompt: str = Input(
+            description="Negative prompts, separated by spaces",
+            default="",
         ),
         seeds: str = Input(
             description="Random seed, separated with '|' to use different seeds for each of the prompt provided above. Leave blank to randomize the seed.",
@@ -85,6 +79,21 @@ class Predictor(BasePredictor):
         ),
     ) -> Path:
         """Run a single prediction on the model"""
+
+        vae = AutoencoderKL.from_pretrained(MODEL_VAE, cache_dir=MODEL_CACHE, local_files_only=True)
+
+        self.pipeline = StableDiffusionWalkPipeline.from_pretrained(
+            model_name,
+            #revision="c9211c53404dd6f4cfac5f04f33535892260668e",
+            vae=vae,
+            torch_dtype=torch.float16,
+            safety_checker=None,
+            cache_dir=MODEL_CACHE,
+            local_files_only=True,
+            scheduler=LMSDiscreteScheduler(
+                beta_start=0.00085, beta_end=0.012, beta_schedule="scaled_linear"
+            )
+        ).to("cuda")
 
         prompts = [p.strip() for p in prompts.split("|")]
         if seeds is None:
@@ -126,6 +135,7 @@ class Predictor(BasePredictor):
 
         self.pipeline.walk(
             prompts=prompts,
+            negative_prompt=negative_prompt,
             seeds=seeds,
             num_interpolation_steps=num_steps,
             output_dir="cog_out",
